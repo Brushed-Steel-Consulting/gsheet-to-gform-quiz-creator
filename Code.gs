@@ -82,6 +82,9 @@ function createQuizFromSheet(e) {
   var shuffleQuestions = e.formInput.shuffleQuestions == "shuffle_questions";
   var shuffleAnswers = e.formInput.shuffleAnswers == "shuffle_answers";
 
+  var folderName = baseQuizName;
+  var quizFolder = DriveApp.createFolder(folderName);
+
   var activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = activeSpreadsheet.getActiveSheet();
   var data = sheet.getDataRange().getValues();
@@ -180,11 +183,16 @@ function createQuizFromSheet(e) {
 
     // Add the shortened URL to the combined HTML content
     combinedHtmlContent += '<p><a href="' + shortUrl + '">' + baseQuizName + ' - Quiz ' + (quizIndex + 1) + '</a></p>';
+
+    // Move the form to the newly created folder
+    var formFile = DriveApp.getFileById(newFormId);
+    formFile.getParents().next().removeFile(formFile);
+    quizFolder.addFile(formFile);
   }
 
   // Save the combined HTML content to Google Drive
   combinedHtmlContent += '</body>';
-  saveHtmlToDrive(combinedHtmlContent, baseQuizName);
+  saveHtmlToDrive(combinedHtmlContent, quizFolder);
 
   // Return the completion message as navigation action
   var action = CardService.newAction()
@@ -199,9 +207,12 @@ function createQuizFromSheet(e) {
 }
 
 // Save HTML content to Google Drive
-function saveHtmlToDrive(htmlContent, fileName) {
-  var folder = DriveApp.createFolder(fileName);
-  var file = folder.createFile(fileName + '.html', htmlContent, MimeType.HTML);
+function saveHtmlToDrive(htmlContent, folder) {
+  var fileName = 'Published Quizzes.html';
+  var mimeType = 'text/html';
+
+  var file = folder.createFile(fileName, htmlContent, mimeType);
+
   return file.getUrl();
 }
 
