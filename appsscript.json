@@ -1,0 +1,26 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/forms",
+    "https://www.googleapis.com/auth/forms.body",
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://www.googleapis.com/auth/spreadsheets.currentonly",
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/drive"
+  ],
+  "addOns": {
+    "common": {
+      "name": "GSheet to GForm Quiz Creator",
+      "logoUrl": "https://drive.google.com/file/d/1xX5WpxxuusjAr7dh4LwtxwVA99RqbHpU/view?usp=sharing",
+      "homepageTrigger": {
+        "runFunction": "onHomePage"
+      }
+    },
+    "sheets" : {}
+  }
+}
