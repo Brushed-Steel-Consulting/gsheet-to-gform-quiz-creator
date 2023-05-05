@@ -16,7 +16,7 @@
   "addOns": {
     "common": {
       "name": "GSheet to GForm Quiz Creator",
-      "logoUrl": "https://drive.google.com/file/d/1xX5WpxxuusjAr7dh4LwtxwVA99RqbHpU/view?usp=sharing",
+      "logoUrl": "https://www.dropbox.com/s/xgkygjsqge8u9lw/gsheet-quiz-creator-24x23.png?dl=1",
       "homepageTrigger": {
         "runFunction": "onHomePage"
       }
