@@ -8,7 +8,17 @@ This project does only one thing: it takes a Google Sheet with questions in the 
 - Points
 - Right/Wrong Answer Feedback
 
-And turns the content below that header into multiple Google Forms configured as quizzes.
+and turns the content below that header into multiple Google Forms configured as quizzes.
+
+# Features
+The G2GQC supports:
+- Creating quiz names with a number after the given quiz name
+- a quiz description (the same for all quizzes)
+- max number of questions to have per quiz
+- enable/disable question shuffling
+- enable/disable answer shuffling
+- if a question is required to be answered before submission
+- explanation when the answer given is right or wrong (only one feedback explanation is supported at the moment)
 
 The Forms are saved on the users GDrive in a folder named after the quiz. A single HTML file is also created that lists the URL to the actual functional submittable quizzes.
 
