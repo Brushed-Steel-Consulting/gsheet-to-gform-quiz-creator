@@ -6,62 +6,83 @@ This project does only one thing: it takes a Google Sheet with questions in the 
 - Answer
 - Required
 - Points
+- Right/Wrong Answer Feedback
 
 And turns the content below that header into multiple Google Forms configured as quizzes.
 
 The Forms are saved on the users GDrive in a folder named after the quiz. A single HTML file is also created that lists the URL to the actual functional submittable quizzes.
 
-I can't get the icon to appear as I don't have a public place where I can put it. Sigh.
-
 GPT-4's take on the documentation:
-# Google Workspace Add-on: GSheet to GForm Quiz Generator
+# Google Apps Script Quiz Generator
 
-## Introduction
-The GSheet to GForm Quiz Generator add-on is designed to help you easily create quizzes from a Google Sheet. Once installed, you can configure various settings for your quizzes, including the quiz name, description, number of questions per quiz, and shuffling of questions and answers.
+The Google Apps Script Quiz Generator is a tool that creates quizzes from Google Sheets data and configures them using the Google Forms API.
 
-## How to Use the Add-on
+## Description
 
-### 1. Install the add-on
-Install the GSheet to GForm Quiz Generator add-on from the Google Workspace Marketplace.
+The Quiz Generator is composed of a few different Google Apps Script (GAS) functions:
 
-### 2. Open the add-on in Google Sheets
-Open the Google Sheet containing your quiz questions, and then click on the "Add-ons" icon in the right sidebar. Select "GSheet to GForm Quiz Generator" to open the add-on.
+- `onHomePage(e)`: This function is used to generate the home page card. This function receives an event object `e` as a parameter, which it passes to the `createHomePage` function.
 
-### 3. Configure quiz settings
-Once the add-on is open, you will see a form with the following fields:
+- `createHomePage(completionMessage)`: This function builds the main page of the app. It takes an optional parameter `completionMessage` that, if present, adds a completion message and a "Process another GSheet" button to the returned card.
 
-- **Quiz Name**: Enter a name for your quiz. This will be used as the base name for all generated quizzes.
-- **Quiz Description**: Provide a short description of your quiz. This description will be visible to quiz takers.
-- **Questions per Quiz**: Specify the number of questions you want in each quiz. The add-on will create multiple quizzes if necessary to accommodate all questions in the Google Sheet.
-- **Shuffle questions**: Check this box to shuffle the order of questions in each quiz. This is enabled by default.
-- **Shuffle answers per question**: Check this box to shuffle the order of answers for each question. This is enabled by default.
+- `createQuizFromSheet(e)`: This is the main function of the app. It takes an event object `e` as a parameter. This function uses the form input data contained in `e` to generate quizzes based on the data in the current active Google Sheet. It creates a new Google Form for each quiz, configures each form to be a quiz, creates questions based on the sheet data, and adds the questions to the form. It also moves the created forms into a new folder in Google Drive.
 
-### 4. Press the "Create Quiz" button
-After you have entered the required information and configured the settings, click the "Create Quiz" button to generate your quizzes.
+- `saveHtmlToDrive(htmlContent, folder)`: This function saves the given HTML content as a new file in the given Google Drive folder. It's used to save a list of links to the created quizzes.
 
-### 5. Wait for quiz generation to complete
-The add-on will now create quizzes based on your Google Sheet data, applying the settings you specified. This process may take a few moments, depending on the size of your sheet and the number of quizzes being generated.
+- `createRadioItem(question, shuffleAnswers, possibleAnswers, actualAnswer, isRequired, points, index, explanation)`: This helper function creates an object representing a multiple-choice question that can be added to a Google Form.
 
-### 6. Access the generated quizzes
-Once the quiz generation is complete, you will see a message that says "Quiz generation is complete." The add-on will create a folder with the same name as your quiz in your Google Drive. Inside this folder, you will find the generated quizzes as Google Forms and an HTML file named "Published Quizzes.html." Open the HTML file to access the published URLs of your quizzes.
+- `createCheckboxItem(question, shuffleAnswers, possibleAnswers, actualAnswers, isRequired, points, index, answerDelimiter, explanation)`: This helper function creates an object representing a checkbox question that can be added to a Google Form.
 
-You can now share these URLs with your audience, or use them to embed the quizzes on a website or other platform.
+## Usage
 
-### 7. Process another Google Sheet (optional)
-If you wish to create quizzes from another Google Sheet, click the "Process another GSheet" button. This will return you to the initial form where you can enter new quiz settings and generate quizzes based on the data in the new sheet.
+To use this script, you need to attach it to a Google Sheet containing quiz questions. The Google Sheet should have the following structure:
 
-In this sample input file, the header consists of 6 columns:
+- Question Text
+- Question Type ("RADIO" for multiple choice, "CHECKBOX" for checkbox)
+- Possible Answers (separated by a delimiter)
+- Actual Answer(s)
+- Whether the question is required (True/False)
+- The number of points the question is worth
+- Explanation text for the question
 
-- **Question**: The question text.
-- **Type**: The question type, such as Multiple Choice (MC).
-- **Possible Answers**: The possible answer choices, separated by a vertical bar (|).
-- **Correct Answer**: The correct answer(s) for the question.
-- **Required**: Whether the question is required or not (TRUE or FALSE).
-- **Points**: The point value of the question.
+Each quiz question should be represented by a separate row in the sheet.
 
-| Question                          | Type | Possible Answers     | Correct Answer | Required | Points |
-| --------------------------------- | ---- | -------------------- | -------------- | -------- | ------ |
-| What is the capital of France?    | MC   | Paris\|London\|Rome  | Paris          | TRUE     | 1      |
-| What colors is red?               | MC   | Red\|Blue\|Green     | Red            | TRUE     | 1      |
-| What is 2 + 2?                    | MC   | 1\|2\|3\|4           | 4              | TRUE     | 1      |
+The form inputs in `createQuizFromSheet(e)` are:
 
+- baseQuizName: The base name for the quizzes.
+- shortDescription: A short description of the quizzes.
+- questionsPerQuiz: The number of questions per quiz.
+- answerDelimiter: The delimiter used to separate possible answers in the Google Sheet.
+- shuffleQuestions: A boolean indicating whether to shuffle the order of the questions in the quiz.
+- shuffleAnswers: A boolean indicating whether to shuffle the order of the answers for each question.
+
+## Limitations
+
+- The Google Forms API used in this script is limited to Google Workspace accounts. If you are using a personal Google account, you will need to find an alternative method to add questions to the form.
+- Error handling in the script is fairly basic. If an error occurs while creating a form or adding a question to a form, you will need to manually check the Google Apps Script logs to find the cause of the error.
+- The script does not currently support question types other than multiple-choice and checkbox. To add support for other question types, you will need to create additional helper functions similar to `createRadioItem` and `createCheckboxItem`.
+
+# Input File Format
+
+The script is designed to work with Google Sheets, where each row represents a different quiz question and its relevant information. The column structure of the sheet should be as follows:
+
+1. **Question Text**: The text of the question to be asked.
+2. **Question Type**: The type of the question. It supports "RADIO" for single answer (multiple choice) and "CHECKBOX" for multiple answers.
+3. **Possible Answers**: The possible answers for the question. Multiple answers should be separated by a predefined delimiter (for example, "XX").
+4. **Actual Answer(s)**: The correct answer(s) for the question. In the case of multiple answers, these should be separated by the same delimiter as the possible answers.
+5. **IsRequired**: Indicates whether the question is mandatory. This should be either "True" or "False".
+6. **Points**: The number of points the question is worth in the quiz.
+7. **Explanation**: The explanation or feedback provided upon answering the question.
+
+## Example
+
+Here's an example of what your Google Sheet might look like:
+
+| Question Text        | Question Type | Possible Answers         | Actual Answer | IsRequired | Points | Explanation                    |
+|----------------------|---------------|--------------------------|---------------|------------|--------|--------------------------------|
+| What's 2+2?         | RADIO         | 3XX4XX5XX6               | 4             | True       | 1      | The sum of 2 and 2 is 4.       |
+| Select prime numbers | CHECKBOX      | 2XX3XX4XX5XX6XX7XX8XX9XX10 | 2XX3XX5XX7    | True       | 2      | 2, 3, 5, and 7 are prime numbers. |
+
+In this example, "XX" is used as the delimiter to separate possible answers and actual answers for checkbox questions. Please adjust the delimiter according to your needs.
+
+It is important to ensure that the input file adheres to this structure to make sure the script functions as expected.
