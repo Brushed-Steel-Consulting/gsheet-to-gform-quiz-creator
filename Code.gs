@@ -150,15 +150,17 @@ function createQuizFromSheet(e) {
       var actualAnswer = row[3];
       var isRequired = row[4];
       var points = row[5];
-      var explanation = row[6];
-      console.info('explanation:', explanation);
+      var explanationWhenRight = row[6];
+      var explanationWhenWrong = row[7];
+      console.info('explanationWhenRight:', explanationWhenRight);
+      console.info('explanationWhenWrong:', explanationWhenWrong);
 
       // Use the helper functions based on the question type
       console.info('questionType:', questionType);
       if (questionType === "RADIO") {
-        return createRadioItem(question, shuffleAnswers, possibleAnswers, actualAnswer, isRequired, points, index, explanation);
+        return createRadioItem(question, shuffleAnswers, possibleAnswers, actualAnswer, isRequired, points, index, explanationWhenRight, explanationWhenWrong);
       } else if (questionType === "CHECKBOX") {
-        return createCheckboxItem(question, shuffleAnswers, possibleAnswers, actualAnswer, isRequired, points, index, answerDelimiter, explanation);
+        return createCheckboxItem(question, shuffleAnswers, possibleAnswers, actualAnswer, isRequired, points, index, answerDelimiter, explanationWhenRight, explanationWhenWrong);
       }
     });
 
@@ -227,7 +229,7 @@ function saveHtmlToDrive(htmlContent, folder) {
   return file.getUrl();
 }
 
-function createRadioItem(question, shuffleAnswers, possibleAnswers, actualAnswer, isRequired, points, index, explanation) {
+function createRadioItem(question, shuffleAnswers, possibleAnswers, actualAnswer, isRequired, points, index, explanationWhenRight, explanationWhenWrong) {
   console.info('Start: createRadioItem()');
 
   return {
@@ -248,10 +250,10 @@ function createRadioItem(question, shuffleAnswers, possibleAnswers, actualAnswer
                 answers: [{ value: actualAnswer }]
               },
               whenRight: {
-                text: explanation
+                text: explanationWhenRight
               },
               whenWrong: {
-                text: explanation
+                text: explanationWhenWrong
               },
               pointValue: points
             }
@@ -263,7 +265,7 @@ function createRadioItem(question, shuffleAnswers, possibleAnswers, actualAnswer
   };
 }
 
-function createCheckboxItem(question, shuffleAnswers, possibleAnswers, actualAnswers, isRequired, points, index, answerDelimiter, explanation) {
+function createCheckboxItem(question, shuffleAnswers, possibleAnswers, actualAnswers, isRequired, points, index, answerDelimiter, explanationWhenRight, explanationWhenWrong) {
   console.info('Start: createCheckboxItem()');
   var actualAnswersArray = actualAnswers.split(answerDelimiter);
   return {
@@ -284,7 +286,10 @@ function createCheckboxItem(question, shuffleAnswers, possibleAnswers, actualAns
                 answers: [{ value: actualAnswer }]
               },
               whenRight: {
-                text: explanation
+                text: explanationWhenRight
+              },
+              whenWrong: {
+                text: explanationWhenWrong
               },
               pointValue: points
             }
